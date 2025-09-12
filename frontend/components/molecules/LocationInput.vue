@@ -6,28 +6,29 @@
     :validation-rules="validationRules"
   >
     <template #default="{ hasError, onValidationError }">
-      <GoogleMapLoader>
-        <template #default="{ google }">
-          <BaseLocationInput
-            :id="id"
-            :model-value="modelValue"
-            :google="google"
-            :restrict-to-specific-addresses="restrictToSpecificAddresses"
-            :has-error="hasError"
-            @update:lat-lng="$emit('update:latLng', $event)"
-            @update:address="$emit('update:address', $event)"
-            @update:city="$emit('update:city', $event)"
-            @location-selected="handleLocationSelected"
-            @validation-error="onValidationError"
-          />
-        </template>
-      </GoogleMapLoader>
+      <template v-if="google">
+        <BaseLocationInput
+          :id="id"
+          :model-value="modelValue"
+          :google="google"
+          :restrict-to-specific-addresses="restrictToSpecificAddresses"
+          :has-error="hasError"
+          @update:lat-lng="$emit('update:latLng', $event)"
+          @update:address="$emit('update:address', $event)"
+          @update:city="$emit('update:city', $event)"
+          @location-selected="handleLocationSelected"
+          @validation-error="onValidationError"
+        />
+      </template>
     </template>
   </ValidatedInput>
 </template>
 
 <script setup lang="ts">
 import type { GeoPoint } from "firebase/firestore"
+
+const { google } = useGoogleMaps()
+
 defineProps({
   modelValue: {
     type: String,

@@ -1,33 +1,31 @@
 <template>
   <div class="full-width map-container">
-    <GoogleMapLoader>
-      <template #default="{ google }">
-        <BaseMap
-          ref="mapRef"
-          :google="google"
-          :map-config="mapConfig"
-          :center="{ lat: center.latitude, lng: center.longitude }"
-        >
-          <template #default="{ map }">
-            <div ref="markersContainer">
-              <BaseMarker
-                v-for="location in staticLocations"
-                v-show="visibleLocations.includes(location.id)"
-                :key="location.id"
-                :map="map"
-                :location="location"
-                :google="google"
-                :position="{
-                  lat: location.latLng.latitude,
-                  lng: location.latLng.longitude
-                }"
-                :title="location.address"
-              />
-            </div>
-          </template>
-        </BaseMap>
-      </template>
-    </GoogleMapLoader>
+    <template v-if="google">
+      <BaseMap
+        ref="mapRef"
+        :google="google"
+        :map-config="mapConfig"
+        :center="{ lat: center.latitude, lng: center.longitude }"
+      >
+        <template #default="{ map }">
+          <div ref="markersContainer">
+            <BaseMarker
+              v-for="location in staticLocations"
+              v-show="visibleLocations.includes(location.id)"
+              :key="location.id"
+              :map="map"
+              :location="location"
+              :google="google"
+              :position="{
+                lat: location.latLng.latitude,
+                lng: location.latLng.longitude
+              }"
+              :title="location.address"
+            />
+          </div>
+        </template>
+      </BaseMap>
+    </template>
   </div>
 </template>
 
@@ -44,6 +42,7 @@ defineEmits<{
   (e: "locationSelected", latLng: GeoPoint): void
 }>()
 
+const { google } = useGoogleMaps()
 const config = useRuntimeConfig()
 const mapRef = ref()
 const staticLocations = ref<LocationDetails[]>([])
