@@ -10,15 +10,16 @@ export const useGoogleMaps = () => {
     try {
       isLoading.value = true
       error.value = null
-      
+
       googleConfig.value = await new Loader({
         libraries: ["places", "marker"],
         apiKey: config.public.GOOGLE_MAPS_API_KEY
       }).load()
-      
+
       isLoading.value = false
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to load Google Maps'
+      error.value =
+        err instanceof Error ? err.message : "Failed to load Google Maps"
       isLoading.value = false
     }
   }
