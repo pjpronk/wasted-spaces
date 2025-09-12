@@ -129,6 +129,24 @@ exports.addLocation = onRequest(async (req: Request, res: Response) => {
       .update(locationData.verificationEmail)
       .digest("hex");
 
+    const db = getFirestore();
+
+    // Check if location with same address already exists
+    const existingLocationQuery = await db
+      .collection("locations")
+      .where("address", "==", locationData.address)
+      .where("city", "==", locationData.city)
+      .get();
+
+    if (!existingLocationQuery.empty) {
+      // Location already exists, report back to user
+      res.status(409).json({
+        error: "Deze locatie staat al op de kaart. Je kunt er een stem op uitbrengen via de locatie-informatie.",
+      });
+      return;
+    }
+
+    // Location doesn't exist, create new location
     // Prepare public location document (no sensitive verification data)
     const locationDoc: Omit<LocationDetails, "id"> = {
       address: locationData.address,
@@ -143,8 +161,6 @@ exports.addLocation = onRequest(async (req: Request, res: Response) => {
       createdAt: now,
       updatedAt: now,
     };
-
-    const db = getFirestore();
 
     // Add public location document
     const writeResult = await db.collection("locations").add(locationDoc);
