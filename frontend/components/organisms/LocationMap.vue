@@ -36,6 +36,7 @@ import type { LocationDetails } from "~/types/types"
 const props = defineProps<{
   locations: LocationDetails[]
   center: GeoPoint
+  zoom?: number
 }>()
 
 defineEmits<{
@@ -51,7 +52,7 @@ const visibleLocations = ref<string[]>([])
 const mapConfig = {
   center: { lat: props.center.latitude, lng: props.center.longitude },
   mapId: config.public.GOOGLE_MAPS_MAP_ID,
-  zoom: 12,
+  zoom: props.zoom || 7.65,
   clickableIcons: false,
   disableDefaultUI: true
 }
