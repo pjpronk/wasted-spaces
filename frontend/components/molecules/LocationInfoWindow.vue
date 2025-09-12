@@ -1,11 +1,18 @@
 <template>
   <div class="location-info-window">
     <div class="image-container">
-      <BaseImage
-        :image="streetViewUrl"
-        alt="Location Street View"
-        class="location-image"
-      />
+      <a 
+        :href="googleMapsStreetViewUrl" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="image-link"
+      >
+        <BaseImage
+          :image="streetViewUrl"
+          alt="Location Street View"
+          class="location-image"
+        />
+      </a>
       <div class="tags-container">
         <BaseTag :tag="location.type" />
         <BaseTag :tag="location.ownership" />
@@ -21,9 +28,11 @@
           <BaseVote :count="location.downvotes || 0" type="downvotes" />
         </BaseButton>
       </div>
-      <BaseButton class="primary-inverted" @click.stop="$emit('close')">
-        Sluiten
-      </BaseButton>
+      <div class="flex-row">
+        <BaseButton class="primary-inverted" @click.stop="$emit('close')">
+          Sluiten
+        </BaseButton>
+      </div>
     </div>
     <Teleport to="body">
       <Overlay
@@ -41,7 +50,6 @@
 import type { LocationDetails } from "~/types/types"
 import { VoteType } from "~/types/types"
 
-const config = useRuntimeConfig()
 
 const openVoteDialog = ref(false)
 const voteType = ref(VoteType.UPVOTE)
@@ -54,19 +62,20 @@ defineEmits<{
   close: []
 }>()
 
+const { generateStreetViewUrl, generateGoogleMapsStreetViewUrl } = useGoogleMaps()
+
 const streetViewUrl = computed(() => {
-  const baseUrl = "https://maps.googleapis.com/maps/api/streetview"
-  const size = "600x400"
-  const apiKey = config.public.GOOGLE_MAPS_API_KEY
-  const location = `${props.location.latLng.latitude},${props.location.latLng.longitude}`
+  return generateStreetViewUrl(
+    props.location.latLng.latitude,
+    props.location.latLng.longitude
+  )
+})
 
-  const params = new URLSearchParams({
-    size,
-    key: apiKey,
-    location
-  })
-
-  return `${baseUrl}?${params.toString()}`
+const googleMapsStreetViewUrl = computed(() => {
+  return generateGoogleMapsStreetViewUrl(
+    props.location.latLng.latitude,
+    props.location.latLng.longitude
+  )
 })
 
 const handleUpvote = () => {
@@ -89,6 +98,19 @@ const handleDownvote = () => {
 
   @include for-tablet-landscape-down {
     height: 150px;
+  }
+}
+
+.image-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
   }
 }
 

@@ -28,10 +28,36 @@ export const useGoogleMaps = () => {
     loadGoogleMaps()
   })
 
+  const generateStreetViewUrl = (latitude: number, longitude: number, size = "600x400") => {
+    const baseUrl = "https://maps.googleapis.com/maps/api/streetview"
+    const location = `${latitude},${longitude}`
+    
+    const params = new URLSearchParams({
+      size,
+      key: config.public.GOOGLE_MAPS_API_KEY,
+      location
+    })
+    
+    return `${baseUrl}?${params.toString()}`
+  }
+
+  const generateGoogleMapsStreetViewUrl = (latitude: number, longitude: number) => {
+    const baseUrl = "https://www.google.com/maps"
+    const location = `${latitude},${longitude}`
+    
+    const params = new URLSearchParams({
+      q: location,
+    })
+    
+    return `${baseUrl}?${params.toString()}`
+  }
+
   return {
     google: readonly(googleConfig),
     isLoading: readonly(isLoading),
     error: readonly(error),
-    loadGoogleMaps
+    loadGoogleMaps,
+    generateStreetViewUrl,
+    generateGoogleMapsStreetViewUrl
   }
 }
